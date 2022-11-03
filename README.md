@@ -37,4 +37,4 @@ QString NeteaseServer = "https://neteasecloudmusic.api.cheese233.cn.eu.org/";
 
 ## License
 
-[MIT](LICENSE) © cheese-233
+[MIT](https://github.com/cheese-233/QNeteaseMusic/blob/master/LICENCE) © cheese-233
