@@ -8,10 +8,13 @@
 
 测试平台使用 Qt 6.3.x 和 MSVC-2019。
 
-```powershell
+```sh
 $ qmake.exe -o Makefile ..\NeteaseMusic\NeteaseMusic.pro -spec win32-msvc "CONFIG+=debug" "CONFIG+=qml_debug"
 $ jom.exe -f Makefile.Debug
 ```
+
+或使用Qt Creator直接编译。
+
 ## 下载
 
 [GitHub Release](https://github.com/cheese-233/QNeteaseMusic/releases/latest/)
@@ -28,7 +31,7 @@ QString NeteaseServer = "https://neteasecloudmusic.api.cheese233.cn.eu.org/";
 
 ## 感谢
 
-使用HarmonyOS Sans做默认字体，感谢[汉仪字库](https://www.hanyi.com.cn/custom-font)提供字体，字体版权归华为所有。
+使用HarmonyOS Sans做默认字体，感谢[汉仪字库](https://www.hanyi.com.cn/custom-font)提供字体，字体版权归华为所有，本作品为非商业使用。
 
 感谢[NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)提供Api服务。
 

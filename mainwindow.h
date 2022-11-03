@@ -35,7 +35,6 @@ public:
     ~MainWindow();
     void playMusic();
     void getNetWork(const QList<QString> &strUrl);
-    QByteArray Qget(const QString &strUrl);
     void searchPage();
     QList<int> *qPlayList;
     void addPlayList(int addId,bool isPlayNow = 0);
@@ -44,6 +43,7 @@ public:
     void paintEvent(QPaintEvent*);
     QString LoginCookie = "";
     void addList(QJsonArray searchArray,QLayout *layout);
+    void ChangeListShows();
 private slots:
     void on_pushButton_clicked();
     void changePlayBar(qint64 value);
@@ -55,6 +55,7 @@ private slots:
     void searchRequestFinished(QNetworkReply* reply);
     void lrcRequestFinished(QNetworkReply* reply);
     void loginRequestFinished(QNetworkReply* reply);
+    void listRequestFinished(QNetworkReply* reply);
     void on_pushButton_3_clicked();
     void on_pushBtn_clicked(int i);
     void on_lineEdit_returnPressed();
@@ -78,7 +79,8 @@ private slots:
     void login_pushbutton_clicked();
 
     void on_tabWidget_2_currentChanged(int index);
-
+    void on_list_clicked(int id);
+    void on_PlayListPage_toolButton_clicked();
 private:
     Ui::MainWindow *ui;
     void resizeEvent(QResizeEvent * event);

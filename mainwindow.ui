@@ -1476,7 +1476,7 @@ QScrollArea {
 }</string>
               </property>
               <property name="currentIndex">
-               <number>0</number>
+               <number>1</number>
               </property>
               <property name="iconSize">
                <size>
@@ -1549,6 +1549,30 @@ QScrollArea {
                <attribute name="title">
                 <string>我的</string>
                </attribute>
+               <layout class="QVBoxLayout" name="verticalLayout_12">
+                <item>
+                 <widget class="QListWidget" name="listWidget">
+                  <property name="frameShape">
+                   <enum>QFrame::NoFrame</enum>
+                  </property>
+                  <property name="lineWidth">
+                   <number>0</number>
+                  </property>
+                  <property name="isWrapping" stdset="0">
+                   <bool>true</bool>
+                  </property>
+                  <property name="resizeMode">
+                   <enum>QListView::Adjust</enum>
+                  </property>
+                  <property name="viewMode">
+                   <enum>QListView::IconMode</enum>
+                  </property>
+                  <property name="Blue" stdset="0">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </widget>
             </item>

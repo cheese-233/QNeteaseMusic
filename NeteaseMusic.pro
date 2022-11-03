@@ -1,7 +1,7 @@
-QT       += core gui multimedia network
+QT       += core gui multimedia network concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-INCLUDEPATH +=.\dll
+INCLUDEPATH +=.\dll/
 CONFIG += c++17
 RC_FILE = icon.rc
 
@@ -25,6 +25,7 @@ FORMS += \
     mainwindow.ui \
     neteaselogin.ui \
     neteaseplaylist.ui \
+    playlistpage.ui \
     qplaying.ui
 
 # Default rules for deployment.

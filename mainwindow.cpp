@@ -8,6 +8,7 @@
 #include <QPropertyAnimation>
 #include <QTimer>
 #include <QMessageBox>
+#include <QtConcurrent>
 #include <QtNetwork>
 #include "qmusictab.h"
 #include "qplaying.h"
@@ -16,8 +17,30 @@
 #include "ui_neteaselogin.h"
 #include "neteaseplaylist.h"
 #include "ui_neteaseplaylist.h"
+#include "ui_playlistpage.h"
 QString localhostName;
 QString NeteaseServer = "https://neteasecloudmusic.api.cheese233.cn.eu.org/";
+QByteArray Qget(const QString &strUrl)
+{
+    assert(!strUrl.isEmpty());
+    QNetworkAccessManager M_qnam;
+
+    const QUrl url = QUrl::fromUserInput(strUrl);
+    assert(url.isValid());
+
+    QNetworkRequest qnr(url);
+    QNetworkReply* reply = M_qnam.get(qnr);
+
+    QEventLoop eventLoop;
+    QObject::connect(reply, &QNetworkReply::finished, &eventLoop, &QEventLoop::quit);
+    eventLoop.exec(QEventLoop::ExcludeUserInputEvents);
+//    qDebug() << "status code= " + QString::number(reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt());
+    QByteArray replyData = reply->readAll();
+    reply->deleteLater();
+    reply = nullptr;
+
+    return replyData;
+}
 NetEaseLogin::NetEaseLogin(QWidget *parent)
     :QWidget{parent}
 {
@@ -49,7 +72,7 @@ QIcon TempBtn2Icon;
 void changePlayingMask(){
     QPixmap pix;
     pix.QPixmap::loadFromData(PlayingImage);
-    pix.scaled(playUi->label->size() ,Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    pix.scaled(playUi->label->size() ,Qt::KeepAspectRatio, Qt::FastTransformation);
     QBitmap mask(playUi->label->size());
     QPainter painter(&mask);
     painter.setRenderHint(QPainter::Antialiasing);
@@ -57,9 +80,9 @@ void changePlayingMask(){
     painter.fillRect(0, 0, playUi->label->size().width(), playUi->label->size().height(), Qt::white);
     painter.setBrush(QColor(0, 0, 0));
     painter.drawRoundedRect(0, 0, playUi->label->size().width(), playUi->label->size().height(), 10, 10);
-    QPixmap image = pix.scaled(playUi->label->size());
-    image.setMask(mask);
-    playUi->label->setPixmap(image);
+    pix = pix.scaled(playUi->label->size());
+    pix.setMask(mask);
+    playUi->label->setPixmap(pix);
     playUi->label->setScaledContents(true);
     playUi->label->setStyleSheet("border:0px;border-radius:10px;");
 }
@@ -103,7 +126,10 @@ QImage playerBgImage;
 void MainWindow::paintEvent(QPaintEvent*){
     if(ui->label->isHidden()){
         QPainter pp(this);
-        QRect Temp(-50,-50,this->width()+100,this->height()+100);
+        int temp;
+        if (this->width() > this->height()) temp = this->width();
+        else temp = this->height();
+        QRect Temp(-50,-50,temp+100,temp+100);
         pp.drawImage(Temp,playerBgImage);
     }
 }
@@ -150,8 +176,10 @@ QString formatTime(int ms)
     return min + ":" + sec ;
 }
 QJsonArray HomeBanner;
-QSettings settings(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::organizationName(), "QNeteaseMusic");
+QSettings settings(QSettings::IniFormat, QSettings::UserScope, "QNeteaseMusic");
 int HomeBannerNow = 0;
+QJsonObject LoginProfile;
+Ui::MainWindow *WhatsMainUi;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -174,8 +202,9 @@ MainWindow::MainWindow(QWidget *parent)
     HomeBanner = QJsonDocument::fromJson(Qget(NeteaseServer+"/banner")).object().value("banners").toArray();
     changeBanner(HomeBannerNow);
     WhatsMain = this;
+    WhatsMainUi = ui;
     LoginCookie = settings.value("Cookie","").toString();
-    QJsonObject LoginProfile = settings.value("profile").toJsonObject();
+    LoginProfile = settings.value("profile").toJsonObject();
     if(!LoginProfile.isEmpty()){
         ui->label_9->setText(LoginProfile.value("nickname").toString());
     }
@@ -271,13 +300,13 @@ QMap<int,QString> listTLyrics;
 void ChangePlayerMainColor(){
     playerMainColor = pixmapMainColor(QImage::fromData(PlayingImage));
     if(playerMainColor.red()+playerMainColor.blue()+playerMainColor.green() > 127*3){
-        QPlayingWeiget->setStyleSheet("QLabel{color:rgb(0,0,0);}QLabel[rgba = \"true\"]{color:rgba(0,0,0,200);}");
+        QPlayingWeiget->setStyleSheet("QLabel{color:rgb(0,0,0);}QLabel[rgba = \"true\"]{color:rgba(0,0,0,150);}");
     }
     else{
-        QPlayingWeiget->setStyleSheet("QLabel{color:rgb(255,255,255);}QLabel[rgba = \"true\"]{color:rgba(255,255,255,200);}");
+        QPlayingWeiget->setStyleSheet("QLabel{color:rgb(255,255,255);}QLabel[rgba = \"true\"]{color:rgba(255,255,255,150);}");
     }
 
-    playerBgImage.QImage::loadFromData(PlayingImage);
+    playerBgImage.loadFromData(PlayingImage);
     QGraphicsBlurEffect *b_effect = new QGraphicsBlurEffect();
     b_effect->setBlurHints(QGraphicsBlurEffect::QualityHint);
     b_effect->setBlurRadius(50);
@@ -306,27 +335,6 @@ void MainWindow::picRequestFinished(QNetworkReply* reply){
     else{
         ui->pushButton_2->setIcon(pix);
     }
-}
-QNetworkAccessManager M_qnam;
-QByteArray MainWindow::Qget(const QString &strUrl)
-{
-    assert(!strUrl.isEmpty());
-
-    const QUrl url = QUrl::fromUserInput(strUrl);
-    assert(url.isValid());
-
-    QNetworkRequest qnr(url);
-    QNetworkReply* reply = M_qnam.get(qnr);
-
-    QEventLoop eventLoop;
-    connect(reply, &QNetworkReply::finished, &eventLoop, &QEventLoop::quit);
-    eventLoop.exec(QEventLoop::ExcludeUserInputEvents);
-//    qDebug() << "status code= " + QString::number(reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt());
-    QByteArray replyData = reply->readAll();
-    reply->deleteLater();
-    reply = nullptr;
-
-    return replyData;
 }
 void MainWindow::requestFinished(QNetworkReply* reply) {
     QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
@@ -774,19 +782,19 @@ void MainWindow::on_pushButton_2_clicked()
     lrcRequest.setUrl(QUrl(NeteaseServer+"lyric?id="+QString::number(playUid)+"&cookie="+LoginCookie.toUtf8().toPercentEncoding()));
     lrcNaManager->get(lrcRequest);
     ChangePlayerMainColor();
-    ResizePlayWidget(this->size());
     ui->label->hide();
     ui->label_2->hide();
+    ResizePlayWidget(this->size());
     WhatsMain->repaint();
 }
 void MainWindow::ResizePlayWidget(QSize size){
     if(ui->label->isHidden()){
         int averageSize = (size.width()/3+size.height()/2)/2;
         playUi->label->setFixedSize(QSize(averageSize,averageSize));
+        changePlayingMask();
         QFont ft;
         ft.setPointSize(size.height()/40);
-            QFont ft_;
-            ft_.setPointSize(ft.pointSize()/0.75);
+            QFont ft_ = QFont(ft);
             ft_.setBold(1);
             playUi->label_8->setFont(ft);
             playUi->label_7->setFont(ft);
@@ -1021,30 +1029,76 @@ void MainWindow::loginRequestFinished(QNetworkReply* reply){
         }
     }
 }
-void addPlayList(QLayout *layout){
-    NeteasePlayList *listWidget = new NeteasePlayList(WhatsMain);
-    Ui::NeteasePlayList *listUi = new Ui::NeteasePlayList;
-    listUi->setupUi(listWidget);
-    layout->addWidget(listWidget);
-}
+QFuture<void> listFuture;
 void MainWindow::on_tabWidget_2_currentChanged(int index)
 {
+    while(ui->listWidget->item(0)){
+        delete ui->listWidget->takeItem(0);
+    }
+    listFuture.cancel();
     if(index == 1 && !LoginCookie.isEmpty()){
-        if(ui->tab_5->layout()){
-            delete(ui->tab_5->layout());
-        }
-        myMapper = new QSignalMapper(this);
-        menuMapper = new QSignalMapper(this);
-        downloadMapper = new QSignalMapper(this);
-        connect(myMapper, SIGNAL(mapped(int)), this, SLOT(on_pushBtn_clicked(int)));
-        connect(menuMapper, SIGNAL(mapped(int)), this, SLOT(nextPlaying(int)));
-        connect(downloadMapper, SIGNAL(mapped(int)), this, SLOT(downloadMusic(int)));
-        QVBoxLayout *layout = new QVBoxLayout;
-        ui->tab_5->setLayout(layout);
-        addPlayList({},layout);
+        QNetworkRequest listRequest;
+        QNetworkAccessManager* listNaManager = new QNetworkAccessManager(this);
+        QMetaObject::Connection listConnRet = QObject::connect(listNaManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(listRequestFinished(QNetworkReply*)));
+        Q_ASSERT(listConnRet);
+        listRequest.setUrl(QUrl(NeteaseServer+"user/playlist?uid="+QByteArray::number(LoginProfile.value("userId").toInt())));
+        listNaManager->get(listRequest);
+//        addNeteasePlayList(QJsonDocument::fromJson(Qget(NeteaseServer+"playlist/detail?id=2895166776")).object(),layout);
     }
     else if(index == 1){
         ui->tabWidget_2->setCurrentIndex(0);
     }
 }
+QSignalMapper * ListMapper;
+void ListRequestToThread(QLabel *label,QString coverUrl){
+        QPixmap pic;
+        pic.loadFromData(Qget(coverUrl));
+        pic.scaled(label->size());
+        label->setPixmap(pic);
+        label->setScaledContents(true);
+}
+void MainWindow::listRequestFinished(QNetworkReply* reply){
+    QByteArray readAll = reply->readAll();
+    ListMapper = new QSignalMapper(WhatsMain);
+    QJsonArray NeteaseList = QJsonDocument::fromJson(readAll).object().value("playlist").toArray();
+    WhatsMainUi->listWidget->setWrapping(true);
+    WhatsMainUi->listWidget->setFlow(QListView::LeftToRight);
+    foreach (QJsonValue listValue, NeteaseList) {
+        QWidget *playListWidget;
+        Ui::NeteasePlayList *PlayListUi;
+        QListWidgetItem *playListItem;
+        QJsonObject ListObject;
+        ListObject = listValue.toObject();
+        playListWidget = new NeteasePlayList(ui->listWidget);
+        PlayListUi = new Ui::NeteasePlayList();
+        playListItem = new QListWidgetItem(ui->listWidget);
+        playListItem->setSizeHint(QSize(146,196));
+        PlayListUi->setupUi(playListWidget);
+        listFuture = QtConcurrent::run(ListRequestToThread,PlayListUi->label,ListObject.value("coverImgUrl").toString());
+        QFontMetrics fontWidth(ui->label_2->font());
+        QString elideNote = fontWidth.elidedText(ListObject.value("name").toString(), Qt::ElideRight, 100);
+        PlayListUi->label_2->setText(elideNote);
+        playListWidget->setToolTip(ListObject.value("name").toString());
+        ui->listWidget->setItemWidget(playListItem,playListWidget);
+        connect(playListWidget,SIGNAL(clicked()),ListMapper,SLOT(map()));
+        ListMapper->setMapping(playListWidget,ListObject.value("id").toInt());
+    }
+    connect(ListMapper,SIGNAL(mapped(int)),this,SLOT(on_list_clicked(int)));
+}
+QWidget *PlayListPageWidget;
+void MainWindow::on_list_clicked(int id){
+    ui->tabWidget->hide();
+    Ui::PlayListPage *PlayListPageUi = new Ui::PlayListPage();
+    PlayListPageWidget = new QWidget(this);
+    PlayListPageUi->setupUi(PlayListPageWidget);
+    ui->verticalLayout_4->addWidget(PlayListPageWidget);
+    connect(PlayListPageUi->toolButton,SIGNAL(clicked()),this,SLOT(on_PlayListPage_toolButton_clicked()));
+    QMusicTab *PlayListTab = new QMusicTab(this);
+    Ui::Form *PlayListUi = new Ui::Form();
+    PlayListUi->setupUi(PlayListTab);
 
+}
+void MainWindow::on_PlayListPage_toolButton_clicked(){
+    delete PlayListPageWidget;
+    ui->tabWidget->show();
+}
