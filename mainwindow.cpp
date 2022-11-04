@@ -129,7 +129,7 @@ void MainWindow::paintEvent(QPaintEvent*){
         int temp;
         if (this->width() > this->height()) temp = this->width();
         else temp = this->height();
-        QRect Temp(-50,-50,temp+100,temp+100);
+        QRect Temp(-100,-100,temp+200,temp+200);
         pp.drawImage(Temp,playerBgImage);
     }
 }
@@ -309,7 +309,7 @@ void ChangePlayerMainColor(){
     playerBgImage.loadFromData(PlayingImage);
     QGraphicsBlurEffect *b_effect = new QGraphicsBlurEffect();
     b_effect->setBlurHints(QGraphicsBlurEffect::QualityHint);
-    b_effect->setBlurRadius(50);
+    b_effect->setBlurRadius(100);
     playerBgImage = applyEffectToImage(playerBgImage, b_effect);
     WhatsMain->repaint();
 }
@@ -752,20 +752,20 @@ void MainWindow::nextPlaying(int i){
 QWidget *playWidget;
 void MainWindow::on_pushButton_2_clicked()
 {
-    if(ui->tabWidget->isHidden() == 1){
+    if(ui->widget_2->isHidden()){
+        ui->widget_2->show();
         ui->pushButton_2->setIcon(TempBtn2Icon);
         playWidget->hide();
         playWidget->deleteLater();
         listLyricsTime.clear();
         listLyricsText.clear();
         listTLyrics.clear();
-        ui->tabWidget->show();
         ui->label->show();
         ui->label_2->show();
         this->repaint();
         return;
     }
-    ui->tabWidget->hide();
+    ui->widget_2->hide();
     playWidget = new QPlaying(this);
     playUi = new Ui::QPlaying();
     playUi->setupUi(playWidget);
@@ -1063,6 +1063,7 @@ void MainWindow::listRequestFinished(QNetworkReply* reply){
     QJsonArray NeteaseList = QJsonDocument::fromJson(readAll).object().value("playlist").toArray();
     WhatsMainUi->listWidget->setWrapping(true);
     WhatsMainUi->listWidget->setFlow(QListView::LeftToRight);
+    connect(ListMapper,SIGNAL(mapped(int)),this,SLOT(on_list_clicked(int)));
     foreach (QJsonValue listValue, NeteaseList) {
         QWidget *playListWidget;
         Ui::NeteasePlayList *PlayListUi;
@@ -1080,25 +1081,44 @@ void MainWindow::listRequestFinished(QNetworkReply* reply){
         PlayListUi->label_2->setText(elideNote);
         playListWidget->setToolTip(ListObject.value("name").toString());
         ui->listWidget->setItemWidget(playListItem,playListWidget);
-        connect(playListWidget,SIGNAL(clicked()),ListMapper,SLOT(map()));
         ListMapper->setMapping(playListWidget,ListObject.value("id").toInt());
+        connect(playListWidget,SIGNAL(clicked()),ListMapper,SLOT(map()));
     }
-    connect(ListMapper,SIGNAL(mapped(int)),this,SLOT(on_list_clicked(int)));
 }
 QWidget *PlayListPageWidget;
+Ui::PlayListPage *PlayListPageUi;
 void MainWindow::on_list_clicked(int id){
     ui->tabWidget->hide();
-    Ui::PlayListPage *PlayListPageUi = new Ui::PlayListPage();
+    PlayListPageUi = new Ui::PlayListPage();
     PlayListPageWidget = new QWidget(this);
     PlayListPageUi->setupUi(PlayListPageWidget);
-    ui->verticalLayout_4->addWidget(PlayListPageWidget);
+    ui->widget_2->layout()->addWidget(PlayListPageWidget);
     connect(PlayListPageUi->toolButton,SIGNAL(clicked()),this,SLOT(on_PlayListPage_toolButton_clicked()));
     QMusicTab *PlayListTab = new QMusicTab(this);
     Ui::Form *PlayListUi = new Ui::Form();
     PlayListUi->setupUi(PlayListTab);
+    QNetworkRequest listRequest;
+    QNetworkAccessManager* listNaManager = new QNetworkAccessManager(this);
+    QMetaObject::Connection listConnRet = QObject::connect(listNaManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(PlaylistRequestFinished(QNetworkReply*)));
+    Q_ASSERT(listConnRet);
+    qDebug() << id;
+    listRequest.setUrl(QUrl(NeteaseServer+"playlist/track/all?id="+QByteArray::number(id)+"&limit=10&offset=1"));
+    listNaManager->get(listRequest);
 
 }
 void MainWindow::on_PlayListPage_toolButton_clicked(){
     delete PlayListPageWidget;
     ui->tabWidget->show();
+}
+void MainWindow::PlaylistRequestFinished(QNetworkReply* reply){
+//    QJsonArray listArray = QJsonDocument::fromJson(reply->readAll()).object().value("songs").toArray();
+//    qDebug() << listArray;
+//    QVBoxLayout *listLayout = PlayListPageUi->scrollAreaWidgetContents->findChild<QVBoxLayout*>("verticalLayout_3");
+//    myMapper = new QSignalMapper(this);
+//    menuMapper = new QSignalMapper(this);
+//    downloadMapper = new QSignalMapper(this);
+//    connect(myMapper, SIGNAL(mapped(int)), this, SLOT(on_pushBtn_clicked(int)));
+//    connect(menuMapper, SIGNAL(mapped(int)), this, SLOT(nextPlaying(int)));
+//    connect(downloadMapper, SIGNAL(mapped(int)), this, SLOT(downloadMusic(int)));
+//    addList(listArray,listLayout);
 }

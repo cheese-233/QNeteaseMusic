@@ -81,6 +81,7 @@ private slots:
     void on_tabWidget_2_currentChanged(int index);
     void on_list_clicked(int id);
     void on_PlayListPage_toolButton_clicked();
+    void PlaylistRequestFinished(QNetworkReply* reply);
 private:
     Ui::MainWindow *ui;
     void resizeEvent(QResizeEvent * event);
