@@ -16,8 +16,10 @@ $ jom.exe -f Makefile.Debug
 或使用Qt Creator直接编译。
 
 ## 下载
+| 下载 | 状态 | 
+|----------|-------------|
+| [GitHub Release](https://github.com/cheese-233/QNeteaseMusic/releases/latest/) |  [![Windows](https://github.com/cheese-233/QNeteaseMusic/actions/workflows/windows-qt.yml/badge.svg)](https://github.com/cheese-233/QNeteaseMusic/actions/workflows/windows-qt.yml) |
 
-[GitHub Release](https://github.com/cheese-233/QNeteaseMusic/releases/latest/)
 
 目前仅编译Windows平台，Linux平台考虑后续增加支持。
 
