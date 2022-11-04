@@ -79,6 +79,7 @@ jobs:
           path: ${{ steps.package.outputs.packageName }}
       # tag 上传Release
       - name: Get release
+        if: startsWith(github.event.ref, 'refs/tags/')
         id: get_release
         uses: bruceadams/get-release@v1.3.2
         env:
