@@ -2,16 +2,9 @@ name: Windows
 on: 
   # push代码时触发workflow
   push:
-    # 忽略README.md
-    paths-ignore:
-      - 'README.md'
-      - 'LICENSE'
-  # pull_request时触发workflow
-  pull_request:
-    # 忽略README.md
-    paths-ignore:
-      - 'README.md'
-      - 'LICENSE'
+    tags:
+    - 'v*'
+  
   workflow_dispatch:
 jobs:
   build:
@@ -65,7 +58,7 @@ jobs:
         env:
           archiveName: ${{ matrix.qt_ver }}-${{ matrix.qt_target }}-${{ matrix.qt_arch }}
           msvcArch: ${{ matrix.msvc_arch }}          
-        shell: pwsh
+        shell: powershell
         run: |
           & ./windows-publish.ps1 ${env:archiveName} ${env:targetName}
           # 记录packageName给后续step
@@ -85,7 +78,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          release_name: ${{ github.ref }}
           draft: false
           prerelease: false
       - name: Upload Release Asset
