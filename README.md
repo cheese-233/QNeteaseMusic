@@ -2,23 +2,23 @@
 
 网易云音乐第三方 Qt 客户端。
 
-本软件仅供学习交流使用 请勿用于其他用途。
+__本软件仅供学习交流使用 请勿用于其他用途。__
 
 ## 编译
 
-测试平台使用 Qt 6.3.x 和 MSVC-2019。
+测试平台使用 Qt 5.15.2 和 MSVC-2019。
 
 ```sh
-$ qmake.exe -o Makefile ..\NeteaseMusic\NeteaseMusic.pro -spec win32-msvc "CONFIG+=debug" "CONFIG+=qml_debug"
-$ jom.exe -f Makefile.Debug
+$ qmake -o Makefile ..\NeteaseMusic\NeteaseMusic.pro
+$ jom -f Makefile
 ```
 
 或使用Qt Creator直接编译。
 
 ## 下载
-| 下载 | 状态 | 
-|----------|-------------|
-| [GitHub Release](https://github.com/cheese-233/QNeteaseMusic/releases/latest/) |  [![Windows](https://github.com/cheese-233/QNeteaseMusic/actions/workflows/windows-qt.yml/badge.svg)](https://github.com/cheese-233/QNeteaseMusic/actions/workflows/windows-qt.yml) |
+| 平台 | 下载 | 状态 | 
+|----------|----------|-------------|
+| Windows | [GitHub Release](https://github.com/cheese-233/QNeteaseMusic/releases/latest/) |  [![Windows](https://github.com/cheese-233/QNeteaseMusic/actions/workflows/windows-qt.yml/badge.svg)](https://github.com/cheese-233/QNeteaseMusic/actions/workflows/windows-qt.yml) |
 
 
 目前仅编译Windows平台，Linux平台考虑后续增加支持。
