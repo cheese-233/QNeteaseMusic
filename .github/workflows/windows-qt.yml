@@ -2,9 +2,16 @@ name: Windows
 on: 
   # push代码时触发workflow
   push:
-    tags:
-    - 'v*'
-  
+    # 忽略README.md
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+  # pull_request时触发workflow
+  pull_request:
+    # 忽略README.md
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
   workflow_dispatch:
 jobs:
   build:
