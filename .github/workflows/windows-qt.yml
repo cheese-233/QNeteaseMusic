@@ -2,15 +2,16 @@ name: Windows
 on: 
   # push代码时触发workflow
   push:
-    paths:
-      - '*.pro'
-      - 'src/**'
-      - '.github/workflows/windows.yml'
+    # 忽略README.md
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+  # pull_request时触发workflow
   pull_request:
-    paths:
-      - '*.pro'
-      - 'src/**'
-      - '.github/workflows/windows.yml' 
+    # 忽略README.md
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
   workflow_dispatch:
 jobs:
   build:
