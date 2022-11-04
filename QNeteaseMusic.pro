@@ -1,7 +1,6 @@
 QT       += core gui multimedia network concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-INCLUDEPATH +=.\dll/
 CONFIG += c++17
 RC_FILE = icon.rc
 
@@ -40,3 +39,5 @@ DISTFILES += \
     dll/libeay32.dll \
     dll/ssleay32.dll \
     icon.rc
+LIBS +=  -L$$PWD/dll
+INCLUDEPATH += dll/

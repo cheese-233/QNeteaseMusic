@@ -942,7 +942,7 @@ void MainWindow::on_pushButton_7_clicked()
     connect(loginUi->pushButton,SIGNAL(clicked()),loginWidget,SLOT(close()));
     connect(loginUi->tabWidget,SIGNAL(currentChanged(int)),this,SLOT(login_tab_changed(int)));
     connect(loginUi->pushButton_2,SIGNAL(clicked()),this,SLOT(login_pushbutton_clicked()));
-    loginWidget->setWindowTitle("µÇÂ¼");
+    loginWidget->setWindowTitle(QString::fromUtf16(u"µÇÂ¼"));
     loginWidget->show();
 }
 QString Qrkey;
