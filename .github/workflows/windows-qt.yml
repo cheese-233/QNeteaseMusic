@@ -65,7 +65,7 @@ jobs:
         env:
           archiveName: ${{ matrix.qt_ver }}-${{ matrix.qt_target }}-${{ matrix.qt_arch }}
           msvcArch: ${{ matrix.msvc_arch }}          
-        shell: powershell
+        shell: pwsh
         run: |
           & ./windows-publish.ps1 ${env:archiveName} ${env:targetName}
           # 记录packageName给后续step
@@ -79,6 +79,7 @@ jobs:
           path: ${{ steps.package.outputs.packageName }}
       # tag 上传Release
       - name: Create Release
+        if: startsWith(github.event.ref, 'refs/tags/')
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -89,6 +90,7 @@ jobs:
           draft: false
           prerelease: false
       - name: Upload Release Asset
+        if: startsWith(github.event.ref, 'refs/tags/')
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
