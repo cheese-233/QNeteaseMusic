@@ -21,12 +21,12 @@ jobs:
       matrix:
         include:
           # 6.3.0
-          - qt_ver: 6.3.0
+          - qt_ver: 6.2.2
             qt_arch: win64_msvc2019_64
             msvc_arch: x64
             qt_arch_install: msvc2019_64
     env:
-      targetName: HelloActions-Qt.exe
+      targetName: QNeteaseMusic.exe
     # 步骤
     steps:
       # 安装Qt
@@ -50,7 +50,7 @@ jobs:
         id: build
         shell: cmd
         run: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.msvc_arch }}
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\Tools\VsDevCmd.bat" ${{ matrix.msvc_arch }}
           qmake
           nmake
           echo winSdkDir=%WindowsSdkDir% >> %GITHUB_ENV%
