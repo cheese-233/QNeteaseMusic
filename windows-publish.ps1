@@ -30,10 +30,7 @@ function Main() {
     Copy-Item dll\* $archiveName\
     Copy-Item release\$targetName $archiveName\
     # 拷贝依赖
-    windeployqt --compiler-runtime $archiveName\$targetName
-    # 删除不必要的文件
-    $excludeList = @("*.qmlc", "*.ilk", "*.exp", "*.lib", "*.pdb")
-    Remove-Item -Path $archiveName -Include $excludeList -Recurse -Force
+    windeployqt --compiler-runtime $archiveName\$targetName --force
     # 打包zip
     Compress-Archive -Path $archiveName $archiveName'.zip'
 }

@@ -64,7 +64,7 @@
             <enum>QTabWidget::Rounded</enum>
            </property>
            <property name="currentIndex">
-            <number>2</number>
+            <number>1</number>
            </property>
            <property name="iconSize">
             <size>
@@ -174,7 +174,7 @@
                       <string/>
                      </property>
                      <property name="icon">
-                      <iconset resource="pic.qrc">
+                      <iconset>
                        <normaloff>:/3left.png</normaloff>:/3left.png</iconset>
                      </property>
                     </widget>
@@ -245,7 +245,7 @@
                       <string/>
                      </property>
                      <property name="icon">
-                      <iconset resource="pic.qrc">
+                      <iconset>
                        <normaloff>:/3right.png</normaloff>:/3right.png</iconset>
                      </property>
                     </widget>
@@ -406,7 +406,6 @@
                </property>
                <property name="font">
                 <font>
-                 <family>Microsoft YaHei UI</family>
                  <pointsize>27</pointsize>
                 </font>
                </property>
@@ -458,7 +457,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="pic.qrc">
+                  <iconset>
                    <normaloff>:/search.png</normaloff>:/search.png</iconset>
                  </property>
                 </widget>
@@ -491,7 +490,7 @@
                   <x>0</x>
                   <y>0</y>
                   <width>758</width>
-                  <height>338</height>
+                  <height>348</height>
                  </rect>
                 </property>
                </widget>
@@ -532,7 +531,7 @@
                </property>
                <widget class="QWidget" name="tab_4">
                 <attribute name="icon">
-                 <iconset resource="pic.qrc">
+                 <iconset>
                   <normaloff>:/people.png</normaloff>:/people.png</iconset>
                 </attribute>
                 <attribute name="title">
@@ -748,7 +747,7 @@ border-radius:5px;</string>
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="pic.qrc">
+                <iconset>
                  <normaloff>:/volumeHigh.png</normaloff>:/volumeHigh.png</iconset>
                </property>
               </widget>
@@ -787,7 +786,7 @@ border-radius:5px;</string>
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="pic.qrc">
+                <iconset>
                  <normaloff>:/singalRange.png</normaloff>:/singalRange.png</iconset>
                </property>
               </widget>
@@ -804,8 +803,6 @@ border-radius:5px;</string>
    </layout>
   </widget>
  </widget>
- <resources>
-  <include location="pic.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

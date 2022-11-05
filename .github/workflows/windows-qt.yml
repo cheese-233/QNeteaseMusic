@@ -65,6 +65,7 @@ jobs:
         env:
           archiveName: ${{ matrix.qt_ver }}${{ matrix.qt_target }}-${{ matrix.qt_arch }}
           msvcArch: ${{ matrix.msvc_arch }}          
+          VCINSTALLDIR: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC
         shell: pwsh
         run: |
           & ./windows-publish.ps1 ${env:archiveName} ${env:targetName}
