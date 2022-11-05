@@ -30,9 +30,9 @@ function Main() {
     Copy-Item dll\* $archiveName\
     Copy-Item release\$targetName $archiveName\
     # 拷贝依赖
-    windeployqt --compiler-runtime $archiveName\$targetName --force
+    windeployqt --compiler-runtime $archiveName\$targetName --force --plugindir $archiveName\plugins
     # 打包zip
-    Compress-Archive -Path $archiveName $archiveName'.zip'
+    Compress-Archive -Path $archiveName $archiveName'.zip' -CompressionLevel Fastest
 }
 
 if ($null -eq $archiveName || $null -eq $targetName) {

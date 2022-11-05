@@ -9,7 +9,7 @@ __本软件仅供学习交流使用 请勿用于其他用途。__
 测试平台使用 Qt 5.15.2 和 MSVC-2019。
 
 ```sh
-$ qmake -o Makefile ..\NeteaseMusic\NeteaseMusic.pro
+$ qmake
 $ jom -f Makefile
 ```
 
