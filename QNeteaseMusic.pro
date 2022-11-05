@@ -1,4 +1,4 @@
-QT       += core gui multimedia network concurrent
+QT       += core gui multimedia network concurrent quickcontrols2
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG += c++17

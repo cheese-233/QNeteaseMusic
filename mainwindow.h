@@ -36,7 +36,7 @@ public:
     void playMusic();
     void getNetWork(const QList<QString> &strUrl);
     void searchPage();
-    QList<int> *qPlayList;
+    QList<long long int> *qPlayList;
     void addPlayList(int addId,bool isPlayNow = 0);
     void changeBanner(int i);
     void ResizePlayWidget(QSize size);
@@ -60,6 +60,7 @@ private slots:
     void on_pushBtn_clicked(int i);
     void on_lineEdit_returnPressed();
     void finishScroll(int value);
+    void finishPageScroll(int value);
     void readGETthings(QNetworkReply* reply);
     void on_horizontalSlider_2_sliderMoved(int position);
     void nextPlaying(int i);

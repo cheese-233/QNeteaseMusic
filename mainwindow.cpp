@@ -149,7 +149,7 @@ void QMusicTab::mouseReleaseEvent(QMouseEvent *ev)
 }
 QMediaPlayer *player = new QMediaPlayer;
 QUrl playUrl;
-int playUid;
+long long playUid;
 int isRange = 1;   //-1:random,0:range,1:signalRange
 QString formatTime(int ms)
 {
@@ -198,7 +198,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->pushButton->setIcon(QIcon(":/stop.png"));
     connect(player,SIGNAL(positionChanged(qint64)),this,SLOT(changePlayBar(qint64)));
     player->setVolume(100);
-    qPlayList = new QList<int>();
+    qPlayList = new QList<long long int>();
     HomeBanner = QJsonDocument::fromJson(Qget(NeteaseServer+"/banner")).object().value("banners").toArray();
     changeBanner(HomeBannerNow);
     WhatsMain = this;
@@ -554,7 +554,7 @@ void MainWindow::addList(QJsonArray searchArray,QLayout *layout){
         formUi->setupUi(SearchW);
         QMenu* pMenu = new QMenu(this);
         formUi->pushButton_2->setMenu(pMenu);
-        formUi->pushButton_2->setStyleSheet("QPushButton::menu-indicator{ image:none;}");
+        formUi->pushButton_2->setStyleSheet("QPushButton::menu-indicator{ image:none;}QPushButton{background-color: rgba(255, 255, 255, 0);border-color: rgba(255, 255, 255, 0);}");
         QAction* pAction = new QAction(this);
         pMenu->addAction(pAction);
         pAction->setText("下一首播放");
@@ -765,6 +765,7 @@ void MainWindow::on_pushButton_2_clicked()
         listTLyrics.clear();
         ui->label->show();
         ui->label_2->show();
+        ui->widget->setStyleSheet("border:5px;border-color: rgba(255, 255, 255, 0);border-radius:5px;background-color:rgb(255,255,255);");
         this->repaint();
         return;
     }
@@ -775,19 +776,20 @@ void MainWindow::on_pushButton_2_clicked()
     ui->verticalLayout_5->insertWidget(0,playWidget);
     playUi->label_2->setText(ui->label_2->text());
     playUi->label_3->setText(ui->label->text());
-    changePlayingMask();
     TempBtn2Icon = ui->pushButton_2->icon();
     ui->pushButton_2->setIcon(QIcon(":/up.png"));
+    ui->widget->setStyleSheet("background-color:rgba(255,255,255,0);");
     QNetworkRequest lrcRequest;
     QNetworkAccessManager* lrcNaManager = new QNetworkAccessManager(this);
     QMetaObject::Connection lrcConnRet = QObject::connect(lrcNaManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(lrcRequestFinished(QNetworkReply*)));
     Q_ASSERT(lrcConnRet);
     lrcRequest.setUrl(QUrl(NeteaseServer+"lyric?id="+QString::number(playUid)+"&cookie="+LoginCookie.toUtf8().toPercentEncoding()));
     lrcNaManager->get(lrcRequest);
-    ChangePlayerMainColor();
     ui->label->hide();
     ui->label_2->hide();
+    ChangePlayerMainColor();
     ResizePlayWidget(this->size());
+    changePlayingMask();
     WhatsMain->repaint();
 }
 void MainWindow::ResizePlayWidget(QSize size){
@@ -945,7 +947,7 @@ void MainWindow::on_pushButton_7_clicked()
     connect(loginUi->pushButton,SIGNAL(clicked()),loginWidget,SLOT(close()));
     connect(loginUi->tabWidget,SIGNAL(currentChanged(int)),this,SLOT(login_tab_changed(int)));
     connect(loginUi->pushButton_2,SIGNAL(clicked()),this,SLOT(login_pushbutton_clicked()));
-    loginWidget->setWindowTitle(QString::fromUtf16(u"登录"));
+    loginWidget->setWindowTitle(QString::fromUtf8("登录"));
     loginWidget->show();
 }
 QString Qrkey;
@@ -1044,10 +1046,9 @@ void MainWindow::on_tabWidget_2_currentChanged(int index)
         QNetworkAccessManager* listNaManager = new QNetworkAccessManager(this);
         QMetaObject::Connection listConnRet = QObject::connect(listNaManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(listRequestFinished(QNetworkReply*)));
         Q_ASSERT(listConnRet);
-        listRequest.setUrl(QUrl(NeteaseServer+"user/playlist?uid="+QByteArray::number(LoginProfile.value("userId").toInt())));
+        listRequest.setUrl(QUrl(NeteaseServer+"user/playlist?uid="+QByteArray::number(LoginProfile.value("userId").toInt())+"&limit=32767"));
         qDebug() << NeteaseServer+"user/playlist?uid="+QByteArray::number(LoginProfile.value("userId").toInt());
         listNaManager->get(listRequest);
-//        addNeteasePlayList(QJsonDocument::fromJson(Qget(NeteaseServer+"playlist/detail?id=2895166776")).object(),layout);
     }
     else if(index == 1){
         ui->tabWidget_2->setCurrentIndex(0);
@@ -1061,58 +1062,69 @@ void ListRequestToThread(QLabel *label,QString coverUrl){
         label->setPixmap(pic);
         label->setScaledContents(true);
 }
-QList<int> PlayListPageIndex;
+QList<long long int> PlayListPageIndex;
+QList<QString> PlayListNames;
+QList<QLabel*> PlayListPics;
 void MainWindow::listRequestFinished(QNetworkReply* reply){
-    QByteArray readAll = reply->readAll();
     ListMapper = new QSignalMapper(WhatsMain);
-    QJsonArray NeteaseList = QJsonDocument::fromJson(readAll).object().value("playlist").toArray();
+    PlayListNames.clear();
+    PlayListPageIndex.clear();
+    PlayListPics.clear();
+    QJsonArray NeteaseList = QJsonDocument::fromJson(reply->readAll()).object().value("playlist").toArray();
     WhatsMainUi->listWidget->setWrapping(true);
     WhatsMainUi->listWidget->setFlow(QListView::LeftToRight);
-    PlayListPageIndex.clear();
-    int i=0;
-    foreach (QJsonValue listValue, NeteaseList) {
+    for(int i=0;i<NeteaseList.size();i++) {
         QWidget *playListWidget;
         Ui::NeteasePlayList *PlayListUi;
         QListWidgetItem *playListItem;
         QJsonObject ListObject;
-        ListObject = listValue.toObject();
+        ListObject = NeteaseList[i].toObject();
         playListWidget = new NeteasePlayList(ui->listWidget);
         PlayListUi = new Ui::NeteasePlayList();
         playListItem = new QListWidgetItem(ui->listWidget);
         playListItem->setSizeHint(QSize(146,196));
         PlayListUi->setupUi(playListWidget);
-        listFuture = QtConcurrent::run(ListRequestToThread,PlayListUi->label,ListObject.value("coverImgUrl").toString());
-        QFontMetrics fontWidth(ui->label_2->font());
+        PlayListPics << PlayListUi->label;
+        listFuture = QtConcurrent::run(ListRequestToThread,PlayListUi->label,ListObject.value("coverImgUrl").toString()+"?param=128y128");
+        QFontMetrics fontWidth(PlayListUi->label_2->font());
         QString elideNote = fontWidth.elidedText(ListObject.value("name").toString(), Qt::ElideRight, 100);
+        PlayListNames << ListObject.value("name").toString();
         PlayListUi->label_2->setText(elideNote);
         playListWidget->setToolTip(ListObject.value("name").toString());
         ui->listWidget->setItemWidget(playListItem,playListWidget);
         connect(playListWidget,SIGNAL(clicked()),ListMapper,SLOT(map()));
         ListMapper->setMapping(playListWidget,i);
-        PlayListPageIndex.append(ListObject.value("id").toInt());
-        i++;
+        PlayListPageIndex.append(ListObject.value("id").toVariant().toLongLong());
     }
     connect(ListMapper, SIGNAL(mapped(int)), this, SLOT(on_list_clicked(int)));
 }
 QWidget *PlayListPageWidget;
 Ui::PlayListPage *PlayListPageUi;
+int PlayListPageNowId;
 void MainWindow::on_list_clicked(int id){
+    PlayListPageNowId = id;
     ui->tabWidget->hide();
     PlayListPageUi = new Ui::PlayListPage();
     PlayListPageWidget = new QWidget(this);
     PlayListPageUi->setupUi(PlayListPageWidget);
     ui->widget_2->layout()->addWidget(PlayListPageWidget);
+    PlayListPageUi->label->setPixmap(*PlayListPics[id]->pixmap());
+    PlayListPageUi->label_2->setText(PlayListNames[id]);
     connect(PlayListPageUi->toolButton,SIGNAL(clicked()),this,SLOT(on_PlayListPage_toolButton_clicked()));
-    QMusicTab *PlayListTab = new QMusicTab(this);
-    Ui::Form *PlayListUi = new Ui::Form();
-    PlayListUi->setupUi(PlayListTab);
+    searchPages = 0;
     QNetworkRequest listRequest;
     QNetworkAccessManager* listNaManager = new QNetworkAccessManager(this);
     QMetaObject::Connection listConnRet = QObject::connect(listNaManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(PlaylistRequestFinished(QNetworkReply*)));
     Q_ASSERT(listConnRet);
-    qDebug() << QByteArray::number(PlayListPageIndex[id]) << PlayListPageIndex << QByteArray::number(id);
-    listRequest.setUrl(QUrl(NeteaseServer+"playlist/track/all?id="+QByteArray::number(PlayListPageIndex[id])+"&limit=10&offset=1"));
+    listRequest.setUrl(QUrl(NeteaseServer+"playlist/track/all?id="+QByteArray::number(PlayListPageIndex[id])+"&limit=10&offset=0"));
     listNaManager->get(listRequest);
+    myMapper = new QSignalMapper(this);
+    menuMapper = new QSignalMapper(this);
+    downloadMapper = new QSignalMapper(this);
+    connect(myMapper, SIGNAL(mapped(int)), this, SLOT(on_pushBtn_clicked(int)));
+    connect(menuMapper, SIGNAL(mapped(int)), this, SLOT(nextPlaying(int)));
+    connect(downloadMapper, SIGNAL(mapped(int)), this, SLOT(downloadMusic(int)));
+    connect(PlayListPageUi->scrollArea->verticalScrollBar(),SIGNAL(valueChanged(int)),this,SLOT(finishPageScroll(int)));
 
 }
 void MainWindow::on_PlayListPage_toolButton_clicked(){
@@ -1122,11 +1134,16 @@ void MainWindow::on_PlayListPage_toolButton_clicked(){
 void MainWindow::PlaylistRequestFinished(QNetworkReply* reply){
     QJsonArray listArray = QJsonDocument::fromJson(reply->readAll()).object().value("songs").toArray();
     QVBoxLayout *listLayout = PlayListPageUi->scrollAreaWidgetContents->findChild<QVBoxLayout*>("verticalLayout_3");
-    myMapper = new QSignalMapper(this);
-    menuMapper = new QSignalMapper(this);
-    downloadMapper = new QSignalMapper(this);
-    connect(myMapper, SIGNAL(mapped(int)), this, SLOT(on_pushBtn_clicked(int)));
-    connect(menuMapper, SIGNAL(mapped(int)), this, SLOT(nextPlaying(int)));
-    connect(downloadMapper, SIGNAL(mapped(int)), this, SLOT(downloadMusic(int)));
     addList(listArray,listLayout);
+}
+void MainWindow::finishPageScroll(int value){
+    if(value == PlayListPageUi->scrollArea->verticalScrollBar()->maximum()){
+        searchPages++;
+        QNetworkRequest listRequest;
+        QNetworkAccessManager* listNaManager = new QNetworkAccessManager(this);
+        QMetaObject::Connection listConnRet = QObject::connect(listNaManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(PlaylistRequestFinished(QNetworkReply*)));
+        Q_ASSERT(listConnRet);
+        listRequest.setUrl(QUrl(NeteaseServer+"playlist/track/all?id="+QByteArray::number(PlayListPageIndex[PlayListPageNowId])+"&limit=10&offset="+QString::number(searchPages*10)+"&cookie="+LoginCookie.toUtf8().toPercentEncoding()));
+        listNaManager->get(listRequest);
+    }
 }

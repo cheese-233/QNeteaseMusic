@@ -21,6 +21,9 @@
         <file>3left.png</file>
         <file>3right.png</file>
         <file>people.png</file>
+        <file>more.png</file>
+        <file>HarmonyOS_Sans_SC_Regular.ttf</file>
+        <file>style.qss</file>
         <file>Textures/checkbox_checked.png</file>
         <file>Textures/checkbox_checked_blue.png</file>
         <file>Textures/checkbox_checked_orange.png</file>
@@ -46,7 +49,6 @@
         <file>Textures/UpArrow_Disable.png</file>
         <file>Textures/UpArrow_orange.png</file>
         <file>Textures/Warning.png</file>
-        <file>more.png</file>
-        <file>HarmonyOS_Sans_SC_Regular.ttf</file>
     </qresource>
+    <qresource prefix="/style"/>
 </RCC>
