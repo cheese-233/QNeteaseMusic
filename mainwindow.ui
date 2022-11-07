@@ -63,9 +63,6 @@
            <property name="tabShape">
             <enum>QTabWidget::Rounded</enum>
            </property>
-           <property name="currentIndex">
-            <number>1</number>
-           </property>
            <property name="iconSize">
             <size>
              <width>16</width>
@@ -174,7 +171,7 @@
                       <string/>
                      </property>
                      <property name="icon">
-                      <iconset>
+                      <iconset resource="pic.qrc">
                        <normaloff>:/3left.png</normaloff>:/3left.png</iconset>
                      </property>
                     </widget>
@@ -245,7 +242,7 @@
                       <string/>
                      </property>
                      <property name="icon">
-                      <iconset>
+                      <iconset resource="pic.qrc">
                        <normaloff>:/3right.png</normaloff>:/3right.png</iconset>
                      </property>
                     </widget>
@@ -457,7 +454,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset>
+                  <iconset resource="pic.qrc">
                    <normaloff>:/search.png</normaloff>:/search.png</iconset>
                  </property>
                 </widget>
@@ -517,9 +514,6 @@
 	min-width:0px;
 }</string>
                </property>
-               <property name="currentIndex">
-                <number>1</number>
-               </property>
                <property name="iconSize">
                 <size>
                  <width>32</width>
@@ -531,7 +525,7 @@
                </property>
                <widget class="QWidget" name="tab_4">
                 <attribute name="icon">
-                 <iconset>
+                 <iconset resource="pic.qrc">
                   <normaloff>:/people.png</normaloff>:/people.png</iconset>
                 </attribute>
                 <attribute name="title">
@@ -747,7 +741,7 @@ border-radius:5px;</string>
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
+                <iconset resource="pic.qrc">
                  <normaloff>:/volumeHigh.png</normaloff>:/volumeHigh.png</iconset>
                </property>
               </widget>
@@ -786,7 +780,7 @@ border-radius:5px;</string>
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
+                <iconset resource="pic.qrc">
                  <normaloff>:/singalRange.png</normaloff>:/singalRange.png</iconset>
                </property>
               </widget>
@@ -803,6 +797,8 @@ border-radius:5px;</string>
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="pic.qrc"/>
+ </resources>
  <connections/>
 </ui>

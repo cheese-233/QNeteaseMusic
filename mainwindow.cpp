@@ -1,11 +1,10 @@
-#include "mainwindow.h"
+ï»¿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "ui_form.h"
 #include <QThread>
 #include <QLabel>
 #include <QRandomGenerator>
 #include <QBitmap>
-#include <QPropertyAnimation>
 #include <QTimer>
 #include <QMessageBox>
 #include <QtConcurrent>
@@ -208,6 +207,8 @@ MainWindow::MainWindow(QWidget *parent)
     if(!LoginProfile.isEmpty()){
         ui->label_9->setText(LoginProfile.value("nickname").toString());
     }
+    ui->tabWidget->setCurrentIndex(0);
+    ui->tabWidget_2->setCurrentIndex(0);
 }
 void MainWindow::changeBanner(int i){
     QString imageStr = "http://"+QUrl(HomeBanner[i].toObject().value("imageUrl").toString()).host()+QUrl(HomeBanner[i].toObject().value("imageUrl").toString()).path()+"?param=680y200";
@@ -557,10 +558,10 @@ void MainWindow::addList(QJsonArray searchArray,QLayout *layout){
         formUi->pushButton_2->setStyleSheet("QPushButton::menu-indicator{ image:none;}QPushButton{background-color: rgba(255, 255, 255, 0);border-color: rgba(255, 255, 255, 0);}");
         QAction* pAction = new QAction(this);
         pMenu->addAction(pAction);
-        pAction->setText("ÏÂÒ»Ê×²¥·Å");
+        pAction->setText("ä¸‹ä¸€é¦–æ’­æ”¾");
         QAction* downAction = new QAction(this);
         pMenu->addAction(downAction);
-        downAction->setText("ÏÂÔØ");
+        downAction->setText("ä¸‹è½½");
         QFontMetrics fontWidth(formUi->label_2->font());
         QString elideNote = fontWidth.elidedText(searchResult.toObject().value("name").toString(), Qt::ElideRight, 500);
         formUi->label_2->setText(elideNote);
@@ -574,7 +575,7 @@ void MainWindow::addList(QJsonArray searchArray,QLayout *layout){
             formUi->label_4->setText("VIP");
         }
         else if(searchResult.toObject().value("fee").toInt() == 4){
-            formUi->label_4->setText("¸¶·Ñ");
+            formUi->label_4->setText("ä»˜è´¹");
         }
         QObject::connect(SearchW,SIGNAL(clicked()),myMapper, SLOT(map()));
         QObject::connect(pAction, SIGNAL(triggered()), menuMapper, SLOT(map()));
@@ -926,12 +927,12 @@ bool isLogin = 0;
 void MainWindow::on_pushButton_7_clicked()
 {
     if(!LoginCookie.isEmpty()){
-        bool result=QMessageBox::question(this, "ÍË³ö","ÊÇ·ñÒªÍË³öµÇÂ¼?");
+        bool result=QMessageBox::question(this, "é€€å‡º","æ˜¯å¦è¦é€€å‡ºç™»å½•?");
         if(result){
             LoginCookie = "";
             settings.setValue("Cookie",LoginCookie);
             settings.remove("profile");
-            ui->label_9->setText("Î´µÇÂ¼");
+            ui->label_9->setText("æœªç™»å½•");
         }
         return;
     }
@@ -947,7 +948,7 @@ void MainWindow::on_pushButton_7_clicked()
     connect(loginUi->pushButton,SIGNAL(clicked()),loginWidget,SLOT(close()));
     connect(loginUi->tabWidget,SIGNAL(currentChanged(int)),this,SLOT(login_tab_changed(int)));
     connect(loginUi->pushButton_2,SIGNAL(clicked()),this,SLOT(login_pushbutton_clicked()));
-    loginWidget->setWindowTitle(QStringLiteral("µÇÂ¼"));
+    loginWidget->setWindowTitle(QStringLiteral("ç™»å½•"));
     loginWidget->show();
 }
 QString Qrkey;
@@ -1024,12 +1025,12 @@ void MainWindow::loginRequestFinished(QNetworkReply* reply){
                 loginWidget->close();
             }
             else if(document.object().value("code").toInt() == 460){
-                qDebug() << "µÇÂ½Ê§°Ü: " << document;
-                QMessageBox::information(this,"µÇÂ¼Ê§°Ü£¡code:"+QString::number(document.object().value("code").toInt()),"Çë³¢ÊÔÊ¹ÓÃÆäËû·½Ê½µÇÂ¼");
+                qDebug() << "ç™»é™†å¤±è´¥: " << document;
+                QMessageBox::information(this,"ç™»å½•å¤±è´¥ï¼code:"+QString::number(document.object().value("code").toInt()),"è¯·å°è¯•ä½¿ç”¨å…¶ä»–æ–¹å¼ç™»å½•");
             }
             else{
-                qDebug() << "µÇÂ½Ê§°Ü: " << document;
-                QMessageBox::information(this,"µÇÂ¼Ê§°Ü£¡code:"+QString::number(document.object().value("code").toInt()),"Çë¼ì²éÊäÈëÊÇ·ñÕýÈ·");
+                qDebug() << "ç™»é™†å¤±è´¥: " << document;
+                QMessageBox::information(this,"ç™»å½•å¤±è´¥ï¼code:"+QString::number(document.object().value("code").toInt()),"è¯·æ£€æŸ¥è¾“å…¥æ˜¯å¦æ­£ç¡®");
             }
         }
     }

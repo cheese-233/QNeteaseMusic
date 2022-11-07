@@ -41,3 +41,7 @@ DISTFILES += \
     icon.rc
 LIBS +=  -L$$PWD/dll
 INCLUDEPATH += dll/
+msvc {
+    QMAKE_CFLAGS += /utf-8
+    QMAKE_CXXFLAGS += /utf-8
+}
